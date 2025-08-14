@@ -16,8 +16,6 @@ import {
     PokemonType
 } from "../styledComponnets/styledIndex.ts";
 
-
-
 async function getPokemon(page: number) {
     const limit = 5;
     const offset = page * limit;
@@ -35,7 +33,6 @@ async function getPokemonDataByName(name: string) {
     }
     return res.json();
 }
-
 
 function Home() {
     const navigate = useNavigate();

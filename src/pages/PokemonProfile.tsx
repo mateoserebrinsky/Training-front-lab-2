@@ -15,19 +15,26 @@ import {
 } from "../styledComponnets/styledIndex.ts";
 
 
-const getEvolutionChain = async (id: number) => {
-    const res = await fetch(`https://pokeapi.co/api/v2/evolution-chain/${id}`);
+const getEvolutionChain = async (evolutionChainUrl: string) => {
+    const res = await fetch(evolutionChainUrl);
     if (!res.ok) {
         throw new Error("Failed to fetch evolution chain");
     }
     return res.json();
 }
 
-
 const getPokemonDetails = async (name: string | undefined) => {
     const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
     if (!res.ok) {
         throw new Error("Failed to fetch data");
+    }
+    return res.json();
+}
+
+const getPokemonSpecies = async (name: string | undefined) => {
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`);
+    if (!res.ok) {
+        throw new Error("Failed to fetch species data");
     }
     return res.json();
 }
@@ -44,14 +51,25 @@ function PokemonProfile() {
     });
     console.log(data)
 
-    const {data: evolutionChain} = useQuery({
-        queryKey: ['evolutionChain', data?.id],
+    const {data: species} = useQuery({
+        queryKey: ['pokemonSpecies', name],
         queryFn: () => {
-            if (data?.id) {
-                return getEvolutionChain(data.id);
+            if (name) {
+                return getPokemonSpecies(name);
             }
             return null;
         }
+    });
+
+    const {data: evolutionChain} = useQuery({
+        queryKey: ['evolutionChain', species?.evolution_chain?.url],
+        queryFn: () => {
+            if (species?.evolution_chain?.url) {
+                return getEvolutionChain(species.evolution_chain.url);
+            }
+            return null;
+        },
+        enabled: !!species?.evolution_chain?.url
     });
 
 
